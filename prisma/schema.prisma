@@ -9,3 +9,27 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Account {
+  id                String    @id @default(uuid()) 
+  email             String?    @unique
+  mobileNumber      String
+  isMobileVerified  Boolean   @default(false)   
+  password          String
+  isGoogleUser      Boolean   @default(false)    
+  isEmailVerified   Boolean   @default(false)
+  isAdmin           Boolean   @default(false)
+  transactionPin    String?
+  username          String?    @unique
+  token             Token?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Token {
+  id                      String    @id @default(uuid())
+  account                 Account      @relation(fields: [accountId], references: [id])  
+  accountId               String    @unique
+  token                   String
+  createdAt               DateTime  @default(now())
+}
