@@ -2,6 +2,14 @@
 
 Afripay express is a fintech application that enables users to initiate cross-border money transfers across african countries with ease. The app should offer real-time exchange rate information, low transaction fees, and quick delivery of funds.
 
+## Services
+
+- [Authentication service](./user/): This service would be responsible for authentication and authorization users. STack would include Nestjs, Postgres, Prisma.
+
+- [Transaction service](./transaction/): This service would be responsible for performing the core financial operations of the app. It would be built using express, typescript, prisma and postgres and Flutterwave or paystack.
+
+- [Notification service](./notification/): This would be responsible for handling email and push notifications. It would be built using either fastapi or golang and mongodb.
+
 ## User FLow
 
 - User signs up with mobile number and requests mobile verification.
@@ -14,17 +22,9 @@ Afripay express is a fintech application that enables users to initiate cross-bo
 
 ## Requirements
 
-- [Nodejs](https://nodejs.org/en/) is a JavaScript runtime built on Chrome's V8 JavaScript engine.
-- [Nestjs](https://nestjs.com/) is a progressive Node.js framework for building efficient, reliable and scalable server-side applications.
-- [Typescript](https://www.typescriptlang.org/) is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale.
-- [Prisma](https://www.prisma.io/) easy to integrate into your framework of choice, Prisma simplifies database access, saves repetitive CRUD boilerplate and increases type safety. Its the perfect companion for building production-grade, robust and scalable web applications.
-- [Postgres](https://www.postgresql.org/) is a powerful, open source object-relational database system with over 35 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
+- [Docker](https://www.docker.com/) is a software platform that allows you to build, test, and deploy applications quickly using containers. It automates the deployment of software applications inside containers by providing an additional layer of abstraction and automation of OS-level virtualization on Linux.
 
-## Installation
-
-```bash
-$ npm install
-```
+- [Docker Compose](https://docs.docker.com/compose/) is a tool for defining and running multi-container applications. It is the key to unlocking a streamlined and efficient development and deployment experience. Compose simplifies the control of your entire application stack, making it easy to manage services, networks, and volumes in a single, comprehensible YAML configuration file. Then, with a single command, you create and start all the services from your configuration file.
 
 ## Running the app
 
@@ -37,19 +37,6 @@ $ npm run start:dev
 
 # production mode
 $ npm run start:prod
-```
-
-## Test
-
-```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
 ```
 
 ## License
