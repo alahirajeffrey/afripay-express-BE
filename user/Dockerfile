@@ -11,6 +11,6 @@ COPY . .
 EXPOSE 3000
 
 ## run migrations before starting application
-# RUN [ "npm", "run", "start:prod" ]
+RUN [ "npm", "run", "start:prod" ]
 
 CMD [ "npm", "run", "start:prod" ]
