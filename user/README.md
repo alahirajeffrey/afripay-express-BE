@@ -2,16 +2,6 @@
 
 Afripay express is a fintech application that enables users to initiate cross-border money transfers across african countries with ease. The app should offer real-time exchange rate information, low transaction fees, and quick delivery of funds.
 
-## User FLow
-
-- User signs up with mobile number and requests mobile verification.
-- User completes account information if mobile verification is successful.
-- User requests for BVN verification.
-- A Wallet and virtual account is created upon BVN verification.
-- User funds his/her account by bank transfer.
-- User can create a virtual card.
-- User can make transfers, purchase airtimes etc.
-
 ## Requirements
 
 - [Nodejs](https://nodejs.org/en/) is a JavaScript runtime built on Chrome's V8 JavaScript engine.
@@ -56,6 +46,3 @@ $ npm run test:cov
 
 Nest is [MIT licensed](LICENSE).
 
-## Developer
-
-[Alahira Jeffrey](https://github.com/alahirajeffrey)
