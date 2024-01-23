@@ -8,19 +8,12 @@ services:
     ports:
       - "3000:3000"
 
-  wallet_service:
-    build:
-      context: ./wallet
-      dockerfile: ./wallet/dockerfile
-    ports:
-      - "3001:3001"
-
   transaction_service:
     build:
       context: ./transaction
       dockerfile: ./transaction/dockerfile
     ports:
-      - "3002:3002"
+      - "3001:3001"
 
   notification_service:
     build:
