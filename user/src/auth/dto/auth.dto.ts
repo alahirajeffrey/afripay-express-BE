@@ -55,7 +55,7 @@ export class CompleteAccountRegistrationDto {
 export class VerifyAccountDto {
   @ApiProperty()
   @IsNotEmpty()
-  mobileNumber: string;
+  accountId: string;
 
   @ApiProperty()
   @IsNotEmpty()
@@ -120,5 +120,11 @@ export class LoginDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  pin: string;
+  loginPin: string;
+}
+
+export class CreateTransactionalPin {
+  @ApiProperty()
+  @IsNotEmpty()
+  transactionalPin: string;
 }
