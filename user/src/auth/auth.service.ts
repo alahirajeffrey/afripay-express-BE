@@ -69,7 +69,40 @@ export class AuthService {
     }
   }
 
-  async resendVerificationOtp() {}
+  async resendVerificationOtp(mobileNumber: string): Promise<ApiResponse> {
+    try {
+      const account = await this.prismaService.account.findFirst({
+        where: { mobileNumber: mobileNumber },
+      });
+
+      const otp = this.utilService.generateOtp();
+
+      const parsesedMobileNumber = this.utilService.parseMobileNumber(
+        account.mobileNumber,
+      );
+      await this.messageService.sendTextMessage(
+        `${account.countryCode}${parsesedMobileNumber}`,
+        `Your mobile verification otp is ${otp}`,
+      );
+
+      const token = await this.jwtService.signAsync(
+        { otp },
+        { expiresIn: '10m' },
+      );
+
+      await this.prismaService.token.update({
+        where: { accountId: account.id },
+        data: { token: token },
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Verification token resent',
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   async checkAfripayTagExists(afrpayTag: string): Promise<ApiResponse> {
     try {
