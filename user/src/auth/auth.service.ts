@@ -4,6 +4,7 @@ import { MessageService } from 'src/utils/message.utils';
 import { UtilService } from 'src/utils/utils.utils';
 import { JwtService } from '@nestjs/jwt';
 import { RegisterAccountDto } from './dto/auth.dto';
+import { ApiResponse } from 'src/common/types/response.types';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +15,7 @@ export class AuthService {
     private utilService: UtilService,
   ) {}
 
-  async registerAccount(dto: RegisterAccountDto) {
+  async registerAccount(dto: RegisterAccountDto): Promise<ApiResponse> {
     try {
       const accountExists = await this.prismaService.account.findFirst({
         where: { mobileNumber: dto.mobileNumber },
@@ -55,9 +56,14 @@ export class AuthService {
               account: { connect: { id: account.id } },
             },
           });
+          return account;
         });
 
-      return { message: 'Verification token sent', data: account };
+      return {
+        message: 'Verification token sent',
+        data: account,
+        statusCode: HttpStatus.CREATED,
+      };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
@@ -65,7 +71,23 @@ export class AuthService {
 
   async resendVerificationOtp() {}
 
-  async checkAfripayTagExists() {}
+  async checkAfripayTagExists(afrpayTag: string): Promise<ApiResponse> {
+    try {
+      const afrpayTagExists = await this.prismaService.account.findFirst({
+        where: { afripayTag: afrpayTag },
+      });
+      if (afrpayTagExists) {
+        throw new HttpException(
+          'Afripay tag already in use',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return { statusCode: HttpStatus.OK, message: 'Afripay tag available' };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   async updateLoginPin() {}
 
