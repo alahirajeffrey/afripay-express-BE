@@ -25,6 +25,9 @@ model Account {
   lastName         String?
   afripayTag        String?    @unique
   transactionPin    String? 
+  profilePicture   String?
+  bvn             String?
+  nationalIdCardUrl    String?
   role    Role   @default(USER)
   token             Token?
   createdAt         DateTime  @default(now())
