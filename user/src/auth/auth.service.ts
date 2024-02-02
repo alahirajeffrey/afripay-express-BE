@@ -6,6 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import {
   CompleteAccountRegistrationDto,
   CreateTransactionalPin,
+  LoginDto,
   RegisterAccountDto,
   VerifyAccountDto,
   updateAccountPinDto,
@@ -296,6 +297,35 @@ export class AuthService {
       if (error.code === 'P2025') {
         throw new HttpException('Account does not exist', HttpStatus.NOT_FOUND);
       }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async login(dto: LoginDto): Promise<ApiResponse> {
+    try {
+      const account = await this.prismaService.account.findFirst({
+        where: { mobileNumber: dto.mobileNumber },
+      });
+
+      if (!account) {
+        throw new HttpException('Account does not exist', HttpStatus.NOT_FOUND);
+      }
+
+      const pinMatches = await verify(account.loginPin, dto.loginPin);
+      if (!pinMatches) {
+        throw new HttpException('Incorrect pin', HttpStatus.UNAUTHORIZED);
+      }
+
+      const payload = {
+        accountId: account.id,
+        email: account.email,
+        // mobileNumber: account.mobileNumber,
+      };
+
+      const accessToken = await this.jwtService.signAsync(payload);
+
+      return { statusCode: HttpStatus.OK, message: accessToken };
+    } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
