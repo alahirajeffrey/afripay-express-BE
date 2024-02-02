@@ -283,4 +283,20 @@ export class AuthService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async createAdmin(accountEmail: string): Promise<ApiResponse> {
+    try {
+      await this.prismaService.account.update({
+        where: { email: accountEmail },
+        data: { role: 'ADMIN' },
+      });
+
+      return { statusCode: HttpStatus.OK, message: 'Account updated to admin' };
+    } catch (error) {
+      if (error.code === 'P2025') {
+        throw new HttpException('Account does not exist', HttpStatus.NOT_FOUND);
+      }
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
