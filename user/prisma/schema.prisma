@@ -21,6 +21,7 @@ model Account {
   isAdmin           Boolean   @default(false)
   loginPin          String?
   firstName        String?
+  countryCode       String?     @default("234")
   lastName         String?
   afripayTag        String?    @unique
   transactionPin    String? 
