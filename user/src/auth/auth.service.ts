@@ -3,8 +3,14 @@ import { PrismaService } from 'src/prisma.service';
 import { MessageService } from 'src/utils/message.utils';
 import { UtilService } from 'src/utils/utils.utils';
 import { JwtService } from '@nestjs/jwt';
-import { RegisterAccountDto, VerifyAccountDto } from './dto/auth.dto';
+import {
+  CreateTransactionalPin,
+  RegisterAccountDto,
+  VerifyAccountDto,
+  updateAccountPinDto,
+} from './dto/auth.dto';
 import { ApiResponse } from 'src/common/types/response.types';
+import { hash, verify } from 'argon2';
 
 @Injectable()
 export class AuthService {
@@ -163,9 +169,52 @@ export class AuthService {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
-  async updateLoginPin() {}
+  async updateLoginPin(
+    accountId: string,
+    dto: updateAccountPinDto,
+  ): Promise<ApiResponse> {
+    try {
+      const account = await this.prismaService.account.findFirst({
+        where: { id: accountId },
+      });
 
-  async updateTransactionPin() {}
+      const passwordMatches = await verify(account.loginPin, dto.oldPin);
+      if (!passwordMatches) {
+        throw new HttpException('Incorrect password', HttpStatus.NOT_FOUND);
+      }
+
+      await this.prismaService.account.update({
+        where: { id: accountId },
+        data: { loginPin: await hash(dto.newPin) },
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Account pin changed successfully',
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async createTransactionPin(
+    accountId: string,
+    dto: CreateTransactionalPin,
+  ): Promise<ApiResponse> {
+    try {
+      await this.prismaService.account.update({
+        where: { id: accountId },
+        data: { loginPin: await hash(dto.transactionalPin) },
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        message: 'Transaction pin created',
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 
   async getAccountDetails() {}
 
