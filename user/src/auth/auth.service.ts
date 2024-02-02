@@ -4,6 +4,7 @@ import { MessageService } from 'src/utils/message.utils';
 import { UtilService } from 'src/utils/utils.utils';
 import { JwtService } from '@nestjs/jwt';
 import {
+  CompleteAccountRegistrationDto,
   CreateTransactionalPin,
   RegisterAccountDto,
   VerifyAccountDto,
@@ -216,7 +217,70 @@ export class AuthService {
     }
   }
 
-  async getAccountDetails() {}
+  async getAccountDetails(accountId: string): Promise<ApiResponse> {
+    try {
+      const account = await this.prismaService.account.findFirst({
+        where: { id: accountId },
+        select: {
+          id: true,
+          email: true,
+          isAdmin: true,
+          role: true,
+          firstName: true,
+          lastName: true,
+          mobileNumber: true,
+          isMobileVerified: true,
+          afripayTag: true,
+          countryCode: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
 
-  async completeAccountRegistration() {}
+      return {
+        statusCode: HttpStatus.OK,
+        data: account,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async completeAccountRegistration(
+    accountId: string,
+    dto: CompleteAccountRegistrationDto,
+  ): Promise<ApiResponse> {
+    try {
+      if (dto.pin != dto.confirmPin) {
+        throw new HttpException('Pins do not match', HttpStatus.BAD_REQUEST);
+      }
+
+      const updatedAccount = await this.prismaService.account.update({
+        where: { id: accountId },
+        data: {
+          loginPin: await hash(dto.pin),
+          email: dto.email,
+          afripayTag: dto.mxeTag,
+          firstName: dto.firstName,
+          lastName: dto.lastName,
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          afripayTag: true,
+          mobileNumber: true,
+          createdAt: true,
+          updatedAt: true,
+        },
+      });
+
+      return {
+        statusCode: HttpStatus.OK,
+        data: updatedAccount,
+      };
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
