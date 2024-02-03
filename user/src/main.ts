@@ -23,7 +23,7 @@ async function bootstrap() {
     .setTitle('Afripay Express')
     .setDescription('Afripay Express API description')
     .setVersion('1.0')
-    .addTag('Afripay Express')
+    .addTag('auth-service')
     .addBearerAuth(
       {
         type: 'http',
