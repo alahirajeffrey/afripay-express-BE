@@ -77,10 +77,10 @@ export class AuthService {
     }
   }
 
-  async resendVerificationOtp(mobileNumber: string): Promise<ApiResponse> {
+  async resendVerificationOtp(accountId: string): Promise<ApiResponse> {
     try {
       const account = await this.prismaService.account.findFirst({
-        where: { mobileNumber: mobileNumber },
+        where: { id: accountId },
       });
 
       const otp = this.utilService.generateOtp();
