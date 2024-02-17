@@ -39,4 +39,35 @@ export class FlutterwaveService {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async createVirtualCard(
+    amount: number,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    dob: string,
+    title: string,
+    gender: string,
+    // currency?: Currency,
+  ) {
+    try {
+      const payload = {
+        // currency: currency,
+        amount: amount,
+        first_name: firstName,
+        last_name: lastName,
+        email: email,
+        phone: phone,
+        date_of_birth: dob,
+        title: title,
+        gender: gender,
+      };
+
+      const response = await this.flw.VirtualCard.create(payload);
+      return response;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
