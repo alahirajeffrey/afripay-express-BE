@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { UtilService } from 'src/utils/utils.utils';
 import { randomUUID } from 'crypto';
+import { FlutterwaveService } from 'src/flutterwave/flutterwave.service';
 
 @Injectable()
 export class WalletService {
@@ -14,6 +15,7 @@ export class WalletService {
     private prismaService: PrismaService,
     private utilService: UtilService,
     private readonly config: ConfigService,
+    private flutterwaveService: FlutterwaveService,
   ) {
     this.paystackApiKey = this.config.get<string>('PAYSTACK_API_KEY');
   }
@@ -24,51 +26,39 @@ export class WalletService {
         where: { email },
       });
 
-      // create wallet
-      const wallet = await this.prismaService.wallet.create({
-        data: {
-          mxeTag: account.afripayTag,
-          account: { connect: { email: account.email } },
-        },
-      });
+      // create virtual account with flutterwave
+      const virtualAccountDetails =
+        await this.flutterwaveService.createVirtualAccount(
+          account.email,
+          account.bvn,
+          true,
+          account.id,
+        );
 
-      // create virtual account
-      // const virtualAccountResponse = await axios.post(
-      //   'https://api.paystack.co/dedicated_account/assign',
-      //   {
-      //     email: account.email,
-      //     first_name: account.firstName,
-      //     last_name: account.lastName,
-      //     phone: account.mobileNumber,
-      //     country: 'NG',
-      //     preferred_bank: 'wema-bank',
-      //     account_number: this.utilService.createAccountNumber(
-      //       account.mobileNumber,
-      //     ),
-      //   },
-      // );
-
-      // if (virtualAccountResponse.status !== 200) {
-      //   throw new HttpException(
-      //     'An error occured while creating virtual accounts',
-      //     HttpStatus.INTERNAL_SERVER_ERROR,
-      //   );
-      // }
-
-      // const virtualAccount = await this.prismaService.virtualAccount.create({
-      //   data: {
-      //     wallet: { connect: { email: account.email } },
-      //     accountNumber: this.utilService.createAccountNumber(
-      //       account.mobileNumber,
-      //     ),
-      //     bankName: 'wema-bank',
-      //     transactionRef: randomUUID(),
-      //   },
-      // });
+      // create wallet and save virtual account details
+      const wallet = await this.prismaService.wallet
+        .create({
+          data: {
+            mxeTag: account.afripayTag,
+            account: { connect: { email: account.email } },
+          },
+        })
+        .then(async (wallet) => {
+          await this.prismaService.virtualAccount.create({
+            data: {
+              accountNumber: virtualAccountDetails.virtualAccountNumber,
+              bankName: virtualAccountDetails.bankName,
+              transactionRef: virtualAccountDetails.txRef,
+              flwRef: virtualAccountDetails.flw_ref,
+              wallet: { connect: { email: wallet.email } },
+            },
+          });
+          return wallet;
+        });
 
       return {
         statusCode: HttpStatus.CREATED,
-        data: { wallet },
+        data: { wallet, virtualAccountDetails },
       };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
