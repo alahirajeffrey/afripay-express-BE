@@ -33,42 +33,42 @@ export class WalletService {
       });
 
       // create virtual account
-      const virtualAccountResponse = await axios.post(
-        'https://api.paystack.co/dedicated_account/assign',
-        {
-          email: account.email,
-          first_name: account.firstName,
-          last_name: account.lastName,
-          phone: account.mobileNumber,
-          country: 'NG',
-          preferred_bank: 'wema-bank',
-          account_number: this.utilService.createAccountNumber(
-            account.mobileNumber,
-          ),
-        },
-      );
+      // const virtualAccountResponse = await axios.post(
+      //   'https://api.paystack.co/dedicated_account/assign',
+      //   {
+      //     email: account.email,
+      //     first_name: account.firstName,
+      //     last_name: account.lastName,
+      //     phone: account.mobileNumber,
+      //     country: 'NG',
+      //     preferred_bank: 'wema-bank',
+      //     account_number: this.utilService.createAccountNumber(
+      //       account.mobileNumber,
+      //     ),
+      //   },
+      // );
 
-      if (virtualAccountResponse.status !== 200) {
-        throw new HttpException(
-          'An error occured while creating virtual accounts',
-          HttpStatus.INTERNAL_SERVER_ERROR,
-        );
-      }
+      // if (virtualAccountResponse.status !== 200) {
+      //   throw new HttpException(
+      //     'An error occured while creating virtual accounts',
+      //     HttpStatus.INTERNAL_SERVER_ERROR,
+      //   );
+      // }
 
-      const virtualAccount = await this.prismaService.virtualAccount.create({
-        data: {
-          wallet: { connect: { email: account.email } },
-          accountNumber: this.utilService.createAccountNumber(
-            account.mobileNumber,
-          ),
-          bankName: 'wema-bank',
-          transactionRef: randomUUID(),
-        },
-      });
+      // const virtualAccount = await this.prismaService.virtualAccount.create({
+      //   data: {
+      //     wallet: { connect: { email: account.email } },
+      //     accountNumber: this.utilService.createAccountNumber(
+      //       account.mobileNumber,
+      //     ),
+      //     bankName: 'wema-bank',
+      //     transactionRef: randomUUID(),
+      //   },
+      // });
 
       return {
         statusCode: HttpStatus.CREATED,
-        data: { wallet, virtualAccount },
+        data: { wallet },
       };
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
