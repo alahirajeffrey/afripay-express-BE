@@ -32,6 +32,8 @@ model Account {
   token             Token?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
+  wallet Wallet?
+  beneficiaries     Wallet[]  @relation("beneficiaries")
 }
 
 model Token {
@@ -45,4 +47,28 @@ model Token {
 enum Role {
   ADMIN
   USER
+}
+
+model Wallet{
+  id              String      @id @default(uuid())
+  account         Account     @relation( fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  email            String      @unique
+  virualAccount VirtualAccount?   
+  // virtualCard   VirtualCard?
+  balance         Float       @default(0)
+  createdAt       DateTime  @default(now())
+  mxeTag        String?
+  updatedAt DateTime    @updatedAt
+  accountBeneficiaries Account[] @relation("beneficiaries")
+}
+
+model VirtualAccount {
+  id              String      @id @default(uuid())
+  wallet         Wallet     @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  email           String      @unique
+  accountNumber   String      @unique
+  bankName    String
+  transactionRef   String
+  flwRef        String
+  createdAt       DateTime  @default(now())
 }
