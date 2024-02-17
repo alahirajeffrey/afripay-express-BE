@@ -70,4 +70,36 @@ export class FlutterwaveService {
       throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async fundAccount(
+    accountBank: string,
+    accountNumber: string,
+    amount: number,
+    // debitCurrency: Currency,
+    // currency: Currency,
+    narration?: string,
+  ) {
+    try {
+      const txRef = `fund-account-${Date.now()}-${accountNumber}`;
+
+      const payload = {
+        account_bank: accountBank,
+        account_number: accountNumber,
+        amount: amount,
+        currency: 'NGN',
+        debit_currency: 'NGN',
+        narration: narration,
+        reference: txRef,
+      };
+
+      const response = await this.flw.Transfer.initiate(payload);
+      return response;
+    } catch (error) {
+      throw new HttpException(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async fundVirtualAccount() {}
+
+  async transferFunds() {}
 }
