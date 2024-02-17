@@ -6,6 +6,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from 'src/auth/guards/authentication.guard';
 import { ConfigService } from '@nestjs/config';
 import { UtilService } from 'src/utils/utils.utils';
+import { FlutterwaveService } from 'src/flutterwave/flutterwave.service';
 
 @Module({
   providers: [
@@ -13,6 +14,7 @@ import { UtilService } from 'src/utils/utils.utils';
     PrismaService,
     ConfigService,
     UtilService,
+    FlutterwaveService,
     { provide: APP_GUARD, useClass: JwtGuard },
   ],
   controllers: [WalletController],
