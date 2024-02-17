@@ -54,10 +54,10 @@ model Wallet{
   account         Account     @relation( fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade)
   email            String      @unique
   virualAccount VirtualAccount?   
-  // virtualCard   VirtualCard?
+  virtualCard   VirtualCard?
   balance         Float       @default(0)
   createdAt       DateTime  @default(now())
-  mxeTag        String?
+  afripayTag        String?
   updatedAt DateTime    @updatedAt
   accountBeneficiaries Account[] @relation("beneficiaries")
 }
@@ -71,4 +71,28 @@ model VirtualAccount {
   transactionRef   String
   flwRef        String
   createdAt       DateTime  @default(now())
+}
+
+model VirtualCard {
+  id              String      @id @default(uuid())
+  wallet         Wallet     @relation(fields: [email], references: [email], onDelete: Cascade, onUpdate: Cascade)
+  email           String      @unique
+  currency   Currency  @default(NGN)
+  firstName        String
+  lastName         String
+  phone           String
+  cardType        String
+  expiration      String
+  cvv             String
+  cardId          String
+  cardPan         String
+  transactionRef   String?
+  isActive        Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Currency {
+  NGN
+  USD
 }
